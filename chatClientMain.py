@@ -4,11 +4,10 @@ import threading
 from tkinter import *
 from tkinter import messagebox
 
-received_message = ""
 shutdown = False
 
 host = "127.0.0.1"
-port = 0
+port = 5500
 server = ("127.0.0.1", 5000)
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -18,10 +17,10 @@ s.setblocking(0)
 username = "Default"
 
 
-def update_messages_sent():
-    if received_message != "":
+def update_messages_sent(msg):
+    if msg != "":
         messages_sent.configure(state="normal")
-        messages_sent.insert(END, received_message + "\n    (" + time.ctime() + ")\n")
+        messages_sent.insert(END, msg + "\n    (" + time.ctime() + ")\n")
         messages_sent.configure(state="disabled")
 
 
@@ -46,12 +45,11 @@ class Client:
         while not shutdown:
             try:
                 self.t_lock.acquire()
-                while True:
-                    data, address = sock.recvfrom(1024)
-                    decoded_data = data.decode("utf-8")
-                    global received_message
-                    received_message = str(decoded_data)
-                    update_messages_sent()
+
+                data, address = sock.recvfrom(1024)
+                decoded_data = data.decode("utf-8")
+                received_message = str(decoded_data)
+                update_messages_sent(received_message)
             except OSError:
                 pass
             finally:
@@ -113,14 +111,22 @@ class Menus:
     def load_chat_history(self):
         messages_sent.configure(state="normal")
         messages_sent.delete(0.0, END)
-        file = open("User_Data.txt", "r")
-        t = file.read()
-        messages_sent.insert(0.0, t)
-        messages_sent.configure(state="disabled")
-        file.close()
+        try:
+            file = open("User_Data.txt", "r")
+            t = file.read()
+            messages_sent.insert(0.0, t)
+            messages_sent.configure(state="disabled")
+            file.close()
+        except FileNotFoundError:
+            print("ERROR: 'User_Data.txt' not found!")
 
     def about(self):
-        messagebox.showinfo("About", "Created By Pei Lin Li\n2015")
+        messagebox.showinfo("About",
+                            "Created By Pei Lin Li\t2015\n\n" +
+                            "Notes:\n" +
+                            "Please type `SHUTDOWN` to turn off the server " +
+                            "and use the `Safe Quit` option in the menus to exit"
+                            )
 
 
 class MainGUI:
