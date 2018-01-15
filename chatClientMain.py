@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import socket
 import time
 import threading
@@ -172,10 +174,13 @@ class UsernameGUI:
 
     def start_main_gui(self, event):
         d_username = str(self.username_get.get())
-        global username
-        username = d_username
-        self.username_get.delete(0, END)
-        self.username_root.destroy()
-        run_main_gui = MainGUI()
+        if d_username != '':
+            global username
+            username = d_username
+            self.username_get.delete(0, END)
+            self.username_root.destroy()
+            MainGUI()
 
-start = UsernameGUI()
+
+if __name__ == '__main__':
+    UsernameGUI()
