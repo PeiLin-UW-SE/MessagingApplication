@@ -27,15 +27,14 @@ class Client:
     @staticmethod
     def about():
         messagebox.showinfo("About",
-                            "Created By Pei Lin Li\t2015\n\n" +
-                            "Notes:\n" +
-                            "Please type `SHUTDOWN` to turn off the server " +
-                            "and use the `Safe Quit` option in the menus to exit"
+                            "Created By Pei Lin Li (2015)\n" +
+                            "Note: Please type `SHUTDOWN` to turn off the server."
                             )
 
     def shutdown(self):
         self.online = False
         self.sock.close()
+        self.thr.join(2)
         self.root.destroy()
         print("----- CONNECTION CLOSED -----")
         sys.exit(0)
@@ -53,6 +52,7 @@ class Client:
                 pass
             finally:
                 self.t_lock.release()
+                time.sleep(0.2)
 
     def sending(self, message):
         if message != "":
@@ -141,6 +141,7 @@ class Client:
 
         self.online = False
         self.sock.close()
+        self.thr.join(2)
         print("----- CONNECTION CLOSED -----")
 
     def __init__(self, host, port, server, username):
